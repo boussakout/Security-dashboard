@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Security Dashboard</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #090c10;
+      color: #c9d1d9;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-size: 13px;
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    /* ── HEADER ── */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #0d1117;
+      border: 1px solid #21262d;
+      border-radius: 8px;
+      padding: 12px 20px;
+      margin-bottom: 16px;
+    }
+
+    header h1 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #e6edf3;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .live-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      color: #8b949e;
+      background: #161b22;
+      border: 1px solid #21262d;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    .dot {
+      width: 7px; height: 7px;
+      background: #3fb950;
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%,100% { opacity:1; } 50% { opacity:0.2; }
+    }
+
+    /* ── STAT CARDS ── */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .card {
+      background: #0d1117;
+      border: 1px solid #21262d;
+      border-radius: 8px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .card:hover { background: #161b22; }
+    .card.active-filter { border-color: currentColor; background: #161b22; }
+
+    .card-icon {
+      font-size: 1.4rem;
+      width: 40px; height: 40px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .card.critical .card-icon { background: #2a0f0f; }
+    .card.warning  .card-icon { background: #1f1700; }
+    .card.info     .card-icon { background: #051a0d; }
+    .card.all      .card-icon { background: #0d1a2a; }
+
+    .card-body { flex: 1; }
+
+    .card-number {
+      font-size: 1.6rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .card.critical .card-number { color: #f85149; }
+    .card.warning  .card-number { color: #e3b341; }
+    .card.info     .card-number { color: #3fb950; }
+    .card.all      .card-number { color: #58a6ff; }
+
+    .card-label {
+      font-size: 0.72rem;
+      color: #8b949e;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-top: 3px;
+    }
+
+    /* ── MAIN GRID ── */
+    .grid {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 12px;
+    }
+
+    /* ── BOXES ── */
+    .box {
+      background: #0d1117;
+      border: 1px solid #21262d;
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .box-title {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #8b949e;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* ── FILTERS ── */
+    .filters {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .filter-label {
+      font-size: 0.72rem;
+      color: #8b949e;
+      margin-right: 4px;
+    }
+
+    .filter-btn {
+      padding: 3px 10px;
+      border-radius: 20px;
+      border: 1px solid #30363d;
+      background: transparent;
+      color: #8b949e;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .filter-btn:hover { background: #161b22; color: #e6edf3; }
+
+    .filter-btn.active-all      { border-color: #58a6ff; color: #58a6ff; background: #0d1a2a; }
+    .filter-btn.active-CRITICAL { border-color: #f85149; color: #f85149; background: #2a0f0f; }
+    .filter-btn.active-WARNING  { border-color: #e3b341; color: #e3b341; background: #1f1700; }
+    .filter-btn.active-INFO     { border-color: #3fb950; color: #3fb950; background: #051a0d; }
+
+    .source-select {
+      padding: 3px 8px;
+      border-radius: 6px;
+      border: 1px solid #30363d;
+      background: #0d1117;
+      color: #c9d1d9;
+      font-size: 0.75rem;
+      cursor: pointer;
+      margin-left: auto;
+    }
+
+    /* ── TABLE ── */
+    .table-wrap {
+      overflow-x: auto;
+      max-height: 460px;
+      overflow-y: auto;
+    }
+
+    .table-wrap::-webkit-scrollbar { width: 4px; }
+    .table-wrap::-webkit-scrollbar-track { background: transparent; }
+    .table-wrap::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
+
+    table { width: 100%; border-collapse: collapse; }
+
+    thead th {
+      position: sticky; top: 0;
+      background: #0d1117;
+      text-align: left;
+      padding: 7px 10px;
+      font-size: 0.7rem;
+      color: #8b949e;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      border-bottom: 1px solid #21262d;
+      white-space: nowrap;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #161b22;
+      transition: background 0.1s;
+    }
+
+    tbody tr:hover { background: #161b22; }
+
+    tbody td {
+      padding: 7px 10px;
+      vertical-align: middle;
+      color: #c9d1d9;
+    }
+
+    .td-time  { white-space: nowrap; color: #8b949e; font-size: 0.78rem; }
+    .td-source{ white-space: nowrap; }
+    .td-msg   { max-width: 480px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 10px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .badge.CRITICAL { background: #2a0f0f; color: #f85149; border: 1px solid #3d1a1a; }
+    .badge.WARNING  { background: #1f1700; color: #e3b341; border: 1px solid #2d2008; }
+    .badge.INFO     { background: #051a0d; color: #3fb950; border: 1px solid #0d2a16; }
+
+    .source-tag {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      background: #161b22;
+      color: #8b949e;
+      border: 1px solid #21262d;
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+      font-size: 0.72rem;
+      color: #8b949e;
+    }
+
+    #event-count { color: #58a6ff; }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <h1>🛡️ Security Dashboard &mdash; Linux Workstation</h1>
+    <div class="live-badge"><span class="dot"></span> Live · refreshes every 5s</div>
+  </header>
+
+  <!-- STAT CARDS -->
+  <div class="cards">
+    <div class="card all" onclick="setFilter('all')">
+      <div class="card-icon">📦</div>
+      <div class="card-body">
+        <div class="card-number" id="count-all">0</div>
+        <div class="card-label">All Events</div>
+      </div>
+    </div>
+    <div class="card critical" onclick="setFilter('CRITICAL')">
+      <div class="card-icon">🔴</div>
+      <div class="card-body">
+        <div class="card-number" id="count-critical">0</div>
+        <div class="card-label">Critical</div>
+      </div>
+    </div>
+    <div class="card warning" onclick="setFilter('WARNING')">
+      <div class="card-icon">🟡</div>
+      <div class="card-body">
+        <div class="card-number" id="count-warning">0</div>
+        <div class="card-label">Warning</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="grid">
+
+    <!-- CHART -->
+    <div class="box">
+      <div class="box-title">Events by Level</div>
+      <canvas id="chart"></canvas>
+      <div style="margin-top:14px;">
+        <div class="box-title">Sources</div>
+        <div id="source-list" style="display:flex;flex-direction:column;gap:6px;margin-top:8px;"></div>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="box">
+      <div class="box-title">
+        Latest Events
+        <select class="source-select" id="source-filter" onchange="renderTable()">
+          <option value="all">All Sources</option>
+          <option value="auth.log">auth.log</option>
+          <option value="syslog">syslog</option>
+          <option value="dpkg.log">dpkg.log</option>
+	  <option value="ufw.log">ufw.log</option>
+        </select>
+      </div>
+
+      <!-- FILTER BUTTONS -->
+      <div class="filters">
+        <span class="filter-label">Filter:</span>
+        <button class="filter-btn active-all" onclick="setFilter('all')">All</button>
+        <button class="filter-btn" onclick="setFilter('CRITICAL')">🔴 Critical</button>
+        <button class="filter-btn" onclick="setFilter('WARNING')">🟡 Warning</button>
+        <button class="filter-btn" onclick="setFilter('INFO')">🟢 Info</button>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Source</th>
+              <th>Level</th>
+              <th>Message</th>
+            </tr>
+          </thead>
+          <tbody id="events-body">
+            <tr><td colspan="4" style="text-align:center;padding:20px;color:#8b949e">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="footer">
+        <span>Showing <span id="event-count">0</span> events</span>
+        <span id="last-updated"></span>
+      </div>
+    </div>
+
+  </div>
+
+<script>
+  let allEvents = [];
+  let currentFilter = 'all';
+
+  // Chart setup
+  const ctx = document.getElementById('chart').getContext('2d');
+  const chart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Critical', 'Warning', 'Info'],
+      datasets: [{
+        data: [0, 0, 0],
+        backgroundColor: ['#f85149', '#e3b341', '#3fb950'],
+        borderColor: '#0d1117',
+        borderWidth: 3,
+        hoverOffset: 6
+      }]
+    },
+    options: {
+      cutout: '70%',
+      plugins: {
+        legend: {
+          labels: { color: '#8b949e', font: { size: 11 }, padding: 14 }
+        }
+      }
+    }
+  });
+
+  function setFilter(level) {
+    currentFilter = level;
+    // Update filter buttons
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.className = 'filter-btn';
+      if (btn.textContent.includes('All')      && level === 'all')      btn.classList.add('active-all');
+      if (btn.textContent.includes('Critical') && level === 'CRITICAL') btn.classList.add('active-CRITICAL');
+      if (btn.textContent.includes('Warning')  && level === 'WARNING')  btn.classList.add('active-WARNING');
+      if (btn.textContent.includes('Info')     && level === 'INFO')     btn.classList.add('active-INFO');
+    });
+    renderTable();
+  }
+
+  function renderTable() {
+    const sourceFilter = document.getElementById('source-filter').value;
+    let filtered = allEvents;
+
+    if (currentFilter !== 'all') {
+      filtered = filtered.filter(e => e.level === currentFilter);
+    }
+    if (sourceFilter !== 'all') {
+      filtered = filtered.filter(e => e.source === sourceFilter);
+    }
+
+    const tbody = document.getElementById('events-body');
+    document.getElementById('event-count').textContent = filtered.length;
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:#8b949e">No events found</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = filtered.map(e => `
+      <tr>
+        <td class="td-time">${e.timestamp}</td>
+        <td><span class="source-tag">${e.source}</span></td>
+        <td><span class="badge ${e.level}">${e.level}</span></td>
+        <td class="td-msg" title="${e.message}">${e.message}</td>
+      </tr>
+    `).join('');
+  }
+
+  function fetchStats() {
+    fetch('/api/stats').then(r => r.json()).then(data => {
+      const total = (data.CRITICAL||0) + (data.WARNING||0) + (data.INFO||0);
+      document.getElementById('count-all').textContent      = total;
+      document.getElementById('count-critical').textContent = data.CRITICAL || 0;
+      document.getElementById('count-warning').textContent  = data.WARNING  || 0;
+
+      chart.data.datasets[0].data = [data.CRITICAL||0, data.WARNING||0, data.INFO||0];
+      chart.update();
+
+      // Source breakdown
+      const sources = {};
+      allEvents.forEach(e => { sources[e.source] = (sources[e.source]||0) + 1; });
+      document.getElementById('source-list').innerHTML = Object.entries(sources).map(([s,c]) => `
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span class="source-tag">${s}</span>
+          <span style="color:#8b949e;font-size:0.78rem;">${c} events</span>
+        </div>
+      `).join('');
+    });
+  }
+
+  function fetchEvents() {
+    fetch('/api/events').then(r => r.json()).then(data => {
+      allEvents = data;
+      renderTable();
+      document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
+    });
+  }
+
+  // Initial load + auto refresh every 5s
+  fetchStats();
+  fetchEvents();
+  setInterval(() => { fetchStats(); fetchEvents(); }, 5000);
+</script>
+</body>
+</html>

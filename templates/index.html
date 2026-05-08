@@ -1,468 +1,703 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Security Dashboard</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-  <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Security Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<style>
+:root {
+  --bg:       #070b0f;
+  --surface:  #0d1117;
+  --border:   #1e2733;
+  --border2:  #2a3441;
+  --text:     #cdd9e5;
+  --muted:    #636e7b;
+  --red:      #f85149;
+  --red-bg:   #2d0f0e;
+  --yellow:   #e3b341;
+  --yellow-bg:#2b1f07;
+  --green:    #3fb950;
+  --green-bg: #0b2a12;
+  --blue:     #58a6ff;
+  --blue-bg:  #0a1f3a;
+  --radius:   8px;
+}
 
-    body {
-      background: #090c10;
-      color: #c9d1d9;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      font-size: 13px;
-      min-height: 100vh;
-      padding: 16px;
-    }
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
-    /* ── HEADER ── */
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: #0d1117;
-      border: 1px solid #21262d;
-      border-radius: 8px;
-      padding: 12px 20px;
-      margin-bottom: 16px;
-    }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-size: 13px;
+  min-height: 100vh;
+}
 
-    header h1 {
-      font-size: 1rem;
-      font-weight: 600;
-      color: #e6edf3;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+/* HEADER */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  height: 52px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
 
-    .live-badge {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.75rem;
-      color: #8b949e;
-      background: #161b22;
-      border: 1px solid #21262d;
-      padding: 4px 10px;
-      border-radius: 20px;
-    }
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #e6edf3;
+}
 
-    .dot {
-      width: 7px; height: 7px;
-      background: #3fb950;
-      border-radius: 50%;
-      animation: pulse 1.5s infinite;
-    }
+.live-pill {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  color: var(--muted);
+  background: #111820;
+  border: 1px solid var(--border);
+  padding: 3px 10px;
+  border-radius: 20px;
+}
 
-    @keyframes pulse {
-      0%,100% { opacity:1; } 50% { opacity:0.2; }
-    }
+.pulse {
+  width: 6px; height: 6px;
+  background: var(--green);
+  border-radius: 50%;
+  animation: blink 2s infinite;
+}
 
-    /* ── STAT CARDS ── */
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-bottom: 16px;
-    }
+@keyframes blink {
+  0%,100%{ opacity:1; } 50%{ opacity:0.2; }
+}
 
-    .card {
-      background: #0d1117;
-      border: 1px solid #21262d;
-      border-radius: 8px;
-      padding: 16px 20px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      cursor: pointer;
-      transition: border-color 0.2s, background 0.2s;
-    }
+/* TOP STATS ROW */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  padding: 16px 24px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
 
-    .card:hover { background: #161b22; }
-    .card.active-filter { border-color: currentColor; background: #161b22; }
+.stat-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.15s;
+  background: var(--bg);
+}
 
-    .card-icon {
-      font-size: 1.4rem;
-      width: 40px; height: 40px;
-      border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-    }
+.stat-box:hover { border-color: var(--border2); background: #0c1520; }
 
-    .card.critical .card-icon { background: #2a0f0f; }
-    .card.warning  .card-icon { background: #1f1700; }
-    .card.info     .card-icon { background: #051a0d; }
-    .card.all      .card-icon { background: #0d1a2a; }
+.stat-box.active.s-all      { border-color: var(--blue);   background: var(--blue-bg); }
+.stat-box.active.s-critical { border-color: var(--red);    background: var(--red-bg); }
+.stat-box.active.s-warning  { border-color: var(--yellow); background: var(--yellow-bg); }
+.stat-box.active.s-info     { border-color: var(--green);  background: var(--green-bg); }
 
-    .card-body { flex: 1; }
+.stat-icon {
+  font-size: 1.4rem;
+  width: 38px; height: 38px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
 
-    .card-number {
-      font-size: 1.6rem;
-      font-weight: 700;
-      line-height: 1;
-    }
+.s-all      .stat-icon { background: var(--blue-bg); }
+.s-critical .stat-icon { background: var(--red-bg); }
+.s-warning  .stat-icon { background: var(--yellow-bg); }
+.s-info     .stat-icon { background: var(--green-bg); }
 
-    .card.critical .card-number { color: #f85149; }
-    .card.warning  .card-number { color: #e3b341; }
-    .card.info     .card-number { color: #3fb950; }
-    .card.all      .card-number { color: #58a6ff; }
+.stat-val {
+  font-size: 1.7rem;
+  font-weight: 700;
+  line-height: 1;
+}
 
-    .card-label {
-      font-size: 0.72rem;
-      color: #8b949e;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      margin-top: 3px;
-    }
+.s-all      .stat-val { color: var(--blue); }
+.s-critical .stat-val { color: var(--red); }
+.s-warning  .stat-val { color: var(--yellow); }
+.s-info     .stat-val { color: var(--green); }
 
-    /* ── MAIN GRID ── */
-    .grid {
-      display: grid;
-      grid-template-columns: 260px 1fr;
-      gap: 12px;
-    }
+.stat-lbl {
+  font-size: 0.68rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-top: 3px;
+}
 
-    /* ── BOXES ── */
-    .box {
-      background: #0d1117;
-      border: 1px solid #21262d;
-      border-radius: 8px;
-      padding: 16px;
-    }
+/* MIDDLE ROW — chart + table */
+.content {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  height: calc(100vh - 52px - 82px - 48px);
+}
 
-    .box-title {
-      font-size: 0.72rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: #8b949e;
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+/* LEFT PANEL */
+.left-panel {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+}
 
-    /* ── FILTERS ── */
-    .filters {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-bottom: 10px;
-      flex-wrap: wrap;
-    }
+.panel-title {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
 
-    .filter-label {
-      font-size: 0.72rem;
-      color: #8b949e;
-      margin-right: 4px;
-    }
+.chart-container {
+  position: relative;
+  width: 100%;
+}
 
-    .filter-btn {
-      padding: 3px 10px;
-      border-radius: 20px;
-      border: 1px solid #30363d;
-      background: transparent;
-      color: #8b949e;
-      font-size: 0.75rem;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
+.chart-center {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+}
 
-    .filter-btn:hover { background: #161b22; color: #e6edf3; }
+.chart-center-num {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+}
 
-    .filter-btn.active-all      { border-color: #58a6ff; color: #58a6ff; background: #0d1a2a; }
-    .filter-btn.active-CRITICAL { border-color: #f85149; color: #f85149; background: #2a0f0f; }
-    .filter-btn.active-WARNING  { border-color: #e3b341; color: #e3b341; background: #1f1700; }
-    .filter-btn.active-INFO     { border-color: #3fb950; color: #3fb950; background: #051a0d; }
+.chart-center-lbl {
+  font-size: 0.65rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
 
-    .source-select {
-      padding: 3px 8px;
-      border-radius: 6px;
-      border: 1px solid #30363d;
-      background: #0d1117;
-      color: #c9d1d9;
-      font-size: 0.75rem;
-      cursor: pointer;
-      margin-left: auto;
-    }
+.legend {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 12px;
+}
 
-    /* ── TABLE ── */
-    .table-wrap {
-      overflow-x: auto;
-      max-height: 460px;
-      overflow-y: auto;
-    }
+.legend-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.75rem;
+}
 
-    .table-wrap::-webkit-scrollbar { width: 4px; }
-    .table-wrap::-webkit-scrollbar-track { background: transparent; }
-    .table-wrap::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
+.legend-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+  flex-shrink: 0;
+}
 
-    table { width: 100%; border-collapse: collapse; }
+.legend-left {
+  display: flex;
+  align-items: center;
+  color: var(--muted);
+}
 
-    thead th {
-      position: sticky; top: 0;
-      background: #0d1117;
-      text-align: left;
-      padding: 7px 10px;
-      font-size: 0.7rem;
-      color: #8b949e;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      border-bottom: 1px solid #21262d;
-      white-space: nowrap;
-    }
+.legend-count {
+  font-weight: 600;
+  color: var(--text);
+}
 
-    tbody tr {
-      border-bottom: 1px solid #161b22;
-      transition: background 0.1s;
-    }
+/* Source list */
+.source-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.1s;
+  margin-bottom: 4px;
+}
 
-    tbody tr:hover { background: #161b22; }
+.source-item:hover { background: #111820; border-color: var(--border); }
+.source-item.active { background: var(--blue-bg); border-color: var(--blue); }
 
-    tbody td {
-      padding: 7px 10px;
-      vertical-align: middle;
-      color: #c9d1d9;
-    }
+.source-name {
+  font-size: 0.75rem;
+  font-family: monospace;
+  color: var(--text);
+}
 
-    .td-time  { white-space: nowrap; color: #8b949e; font-size: 0.78rem; }
-    .td-source{ white-space: nowrap; }
-    .td-msg   { max-width: 480px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.source-badge {
+  font-size: 0.68rem;
+  background: #111820;
+  color: var(--muted);
+  padding: 1px 7px;
+  border-radius: 10px;
+}
 
-    .badge {
-      display: inline-block;
-      padding: 2px 7px;
-      border-radius: 10px;
-      font-size: 0.7rem;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-    }
+/* RIGHT PANEL */
+.right-panel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
 
-    .badge.CRITICAL { background: #2a0f0f; color: #f85149; border: 1px solid #3d1a1a; }
-    .badge.WARNING  { background: #1f1700; color: #e3b341; border: 1px solid #2d2008; }
-    .badge.INFO     { background: #051a0d; color: #3fb950; border: 1px solid #0d2a16; }
+/* TOOLBAR */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
 
-    .source-tag {
-      display: inline-block;
-      padding: 2px 7px;
-      border-radius: 4px;
-      font-size: 0.7rem;
-      background: #161b22;
-      color: #8b949e;
-      border: 1px solid #21262d;
-    }
+.filter-btn {
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.73rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
 
-    /* ── FOOTER ── */
-    .footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 8px;
-      font-size: 0.72rem;
-      color: #8b949e;
-    }
+.filter-btn:hover { color: var(--text); border-color: var(--border2); }
+.filter-btn.active.f-all      { background:var(--blue-bg);   border-color:var(--blue);   color:var(--blue); }
+.filter-btn.active.f-CRITICAL { background:var(--red-bg);    border-color:var(--red);    color:var(--red); }
+.filter-btn.active.f-WARNING  { background:var(--yellow-bg); border-color:var(--yellow); color:var(--yellow); }
+.filter-btn.active.f-INFO     { background:var(--green-bg);  border-color:var(--green);  color:var(--green); }
 
-    #event-count { color: #58a6ff; }
-  </style>
+.sep { width:1px; height:16px; background:var(--border); }
+
+.search-box {
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: #111820;
+  color: var(--text);
+  font-size: 0.73rem;
+  width: 200px;
+  transition: border-color 0.15s;
+}
+
+.search-box:focus { outline:none; border-color:var(--blue); }
+.search-box::placeholder { color: var(--muted); }
+
+.date-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.date-btn {
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.date-btn:hover { color:var(--text); border-color:var(--border2); }
+.date-btn.active { background:var(--blue-bg); border-color:var(--blue); color:var(--blue); }
+
+.date-input {
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.72rem;
+}
+
+.date-input:focus { outline:none; border-color:var(--blue); }
+
+/* TABLE */
+.table-wrap {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.table-wrap::-webkit-scrollbar { width: 4px; }
+.table-wrap::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+table { width:100%; border-collapse:collapse; }
+
+thead th {
+  position: sticky; top: 0;
+  background: var(--surface);
+  padding: 8px 14px;
+  text-align: left;
+  font-size: 0.67rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+tbody tr { border-bottom: 1px solid #0d1420; transition: background 0.1s; }
+tbody tr:hover { background: #0d1520; }
+tbody td { padding: 7px 14px; vertical-align: middle; }
+
+.td-time  { white-space:nowrap; color:var(--muted); font-size:0.73rem; font-family:monospace; width:155px; }
+.td-src   { width:90px; }
+.td-lvl   { width:95px; }
+.td-msg   { color:var(--text); max-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+.badge {
+  display: inline-flex;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.67rem;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+
+.badge.CRITICAL { background:var(--red-bg);    color:var(--red);    border:1px solid #4a1515; }
+.badge.WARNING  { background:var(--yellow-bg); color:var(--yellow); border:1px solid #3d2d10; }
+.badge.INFO     { background:var(--green-bg);  color:var(--green);  border:1px solid #143d1e; }
+
+.src-tag {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 0.68rem;
+  font-family: monospace;
+  background: #111820;
+  color: var(--muted);
+  border: 1px solid var(--border);
+}
+
+/* STATUS BAR */
+.statusbar {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 16px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  font-size: 0.68rem;
+  color: var(--muted);
+}
+
+.statusbar b { color: var(--blue); }
+
+.empty {
+  text-align: center;
+  padding: 60px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+</style>
 </head>
 <body>
 
-  <!-- HEADER -->
-  <header>
-    <h1>🛡️ Security Dashboard &mdash; Linux Workstation</h1>
-    <div class="live-badge"><span class="dot"></span> Live · refreshes every 5s</div>
-  </header>
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">🛡️ Security Dashboard <span style="color:var(--muted);font-weight:400">— Linux Workstation</span></div>
+  <div class="live-pill"><span class="pulse"></span> Live · refreshes every 5s</div>
+</div>
 
-  <!-- STAT CARDS -->
-  <div class="cards">
-    <div class="card all" onclick="setFilter('all')">
-      <div class="card-icon">📦</div>
-      <div class="card-body">
-        <div class="card-number" id="count-all">0</div>
-        <div class="card-label">All Events</div>
-      </div>
-    </div>
-    <div class="card critical" onclick="setFilter('CRITICAL')">
-      <div class="card-icon">🔴</div>
-      <div class="card-body">
-        <div class="card-number" id="count-critical">0</div>
-        <div class="card-label">Critical</div>
-      </div>
-    </div>
-    <div class="card warning" onclick="setFilter('WARNING')">
-      <div class="card-icon">🟡</div>
-      <div class="card-body">
-        <div class="card-number" id="count-warning">0</div>
-        <div class="card-label">Warning</div>
-      </div>
+<!-- STATS ROW -->
+<div class="stats-row">
+  <div class="stat-box s-all active" onclick="setLevel('all')">
+    <div class="stat-icon">📦</div>
+    <div>
+      <div class="stat-val" id="cnt-all">0</div>
+      <div class="stat-lbl">All Events</div>
     </div>
   </div>
+  <div class="stat-box s-critical" onclick="setLevel('CRITICAL')">
+    <div class="stat-icon">🔴</div>
+    <div>
+      <div class="stat-val" id="cnt-critical">0</div>
+      <div class="stat-lbl">Critical</div>
+    </div>
+  </div>
+  <div class="stat-box s-warning" onclick="setLevel('WARNING')">
+    <div class="stat-icon">🟡</div>
+    <div>
+      <div class="stat-val" id="cnt-warning">0</div>
+      <div class="stat-lbl">Warning</div>
+    </div>
+  </div>
+  <div class="stat-box s-info" onclick="setLevel('INFO')">
+    <div class="stat-icon">🟢</div>
+    <div>
+      <div class="stat-val" id="cnt-info">0</div>
+      <div class="stat-lbl">Info</div>
+    </div>
+  </div>
+</div>
 
-  <!-- MAIN GRID -->
-  <div class="grid">
+<!-- CONTENT -->
+<div class="content">
 
-    <!-- CHART -->
-    <div class="box">
-      <div class="box-title">Events by Level</div>
-      <canvas id="chart"></canvas>
-      <div style="margin-top:14px;">
-        <div class="box-title">Sources</div>
-        <div id="source-list" style="display:flex;flex-direction:column;gap:6px;margin-top:8px;"></div>
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+
+    <div>
+      <div class="panel-title">Events by Level</div>
+      <div class="chart-container">
+        <canvas id="chart" height="180"></canvas>
+        <div class="chart-center">
+          <div class="chart-center-num" id="chart-total">0</div>
+          <div class="chart-center-lbl">Total</div>
+        </div>
+      </div>
+      <div class="legend">
+        <div class="legend-item">
+          <div class="legend-left"><span class="legend-dot" style="background:#f85149"></span>Critical</div>
+          <span class="legend-count" id="leg-critical">0</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-left"><span class="legend-dot" style="background:#e3b341"></span>Warning</div>
+          <span class="legend-count" id="leg-warning">0</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-left"><span class="legend-dot" style="background:#3fb950"></span>Info</div>
+          <span class="legend-count" id="leg-info">0</span>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel-title">Sources</div>
+      <div id="source-list"></div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+      <button class="filter-btn f-all active"      onclick="setLevel('all')">All</button>
+      <button class="filter-btn f-CRITICAL"        onclick="setLevel('CRITICAL')">🔴 Critical</button>
+      <button class="filter-btn f-WARNING"         onclick="setLevel('WARNING')">🟡 Warning</button>
+      <button class="filter-btn f-INFO"            onclick="setLevel('INFO')">🟢 Info</button>
+      <div class="sep"></div>
+      <input class="search-box" id="search" placeholder="🔍 Search..." oninput="renderTable()"/>
+      <div class="date-group">
+        <button class="date-btn active" id="btn-alltime"   onclick="setDate('all')">All time</button>
+        <button class="date-btn"        id="btn-today"     onclick="setDate('today')">Today</button>
+        <input  class="date-input" type="date" id="date-picker" onchange="setDate('custom')" title="Pick a date"/>
       </div>
     </div>
 
     <!-- TABLE -->
-    <div class="box">
-      <div class="box-title">
-        Latest Events
-        <select class="source-select" id="source-filter" onchange="renderTable()">
-          <option value="all">All Sources</option>
-          <option value="auth.log">auth.log</option>
-          <option value="syslog">syslog</option>
-          <option value="dpkg.log">dpkg.log</option>
-	  <option value="ufw.log">ufw.log</option>
-        </select>
-      </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Source</th>
+            <th>Level</th>
+            <th>Message</th>
+          </tr>
+        </thead>
+        <tbody id="tbody">
+          <tr><td colspan="4"><div class="empty">⏳ Loading...</div></td></tr>
+        </tbody>
+      </table>
+    </div>
 
-      <!-- FILTER BUTTONS -->
-      <div class="filters">
-        <span class="filter-label">Filter:</span>
-        <button class="filter-btn active-all" onclick="setFilter('all')">All</button>
-        <button class="filter-btn" onclick="setFilter('CRITICAL')">🔴 Critical</button>
-        <button class="filter-btn" onclick="setFilter('WARNING')">🟡 Warning</button>
-        <button class="filter-btn" onclick="setFilter('INFO')">🟢 Info</button>
-      </div>
-
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Time</th>
-              <th>Source</th>
-              <th>Level</th>
-              <th>Message</th>
-            </tr>
-          </thead>
-          <tbody id="events-body">
-            <tr><td colspan="4" style="text-align:center;padding:20px;color:#8b949e">Loading...</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="footer">
-        <span>Showing <span id="event-count">0</span> events</span>
-        <span id="last-updated"></span>
-      </div>
+    <!-- STATUS BAR -->
+    <div class="statusbar">
+      <div>Showing <b id="shown">0</b> events</div>
+      <div id="updated"></div>
     </div>
 
   </div>
+</div>
 
 <script>
-  let allEvents = [];
-  let currentFilter = 'all';
+let allEvents   = [];
+let levelFilter = 'all';
+let dateFilter  = 'all';
+let customDate  = '';
+let sourceFilter = 'all';
 
-  // Chart setup
-  const ctx = document.getElementById('chart').getContext('2d');
-  const chart = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: ['Critical', 'Warning', 'Info'],
-      datasets: [{
-        data: [0, 0, 0],
-        backgroundColor: ['#f85149', '#e3b341', '#3fb950'],
-        borderColor: '#0d1117',
-        borderWidth: 3,
-        hoverOffset: 6
-      }]
-    },
-    options: {
-      cutout: '70%',
-      plugins: {
-        legend: {
-          labels: { color: '#8b949e', font: { size: 11 }, padding: 14 }
-        }
-      }
-    }
+// Chart
+const chart = new Chart(document.getElementById('chart').getContext('2d'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Critical','Warning','Info'],
+    datasets:[{
+      data:[0,0,0],
+      backgroundColor:['#f85149','#e3b341','#3fb950'],
+      borderColor:'#0d1117',
+      borderWidth:2,
+      hoverOffset:4
+    }]
+  },
+  options:{
+    cutout:'72%',
+    plugins:{ legend:{ display:false } }
+  }
+});
+
+function todayStr() {
+  return new Date().toISOString().slice(0,10);
+}
+
+// ── Set level filter ─────────────────────────────────────────
+function setLevel(level) {
+  levelFilter = level;
+  document.querySelectorAll('.stat-box').forEach(c => c.classList.remove('active'));
+  const map = {all:'s-all',CRITICAL:'s-critical',WARNING:'s-warning',INFO:'s-info'};
+  document.querySelector('.'+map[level])?.classList.add('active');
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector('.filter-btn.f-'+level)?.classList.add('active');
+  renderTable();
+  updateChartForFilter();
+}
+
+// ── Set date filter ──────────────────────────────────────────
+function setDate(mode) {
+  dateFilter = mode;
+  document.querySelectorAll('.date-btn').forEach(b => b.classList.remove('active'));
+  if (mode === 'all')   document.getElementById('btn-alltime').classList.add('active');
+  if (mode === 'today') document.getElementById('btn-today').classList.add('active');
+  if (mode === 'custom') {
+    customDate = document.getElementById('date-picker').value;
+  } else {
+    document.getElementById('date-picker').value = '';
+  }
+  renderTable();
+  updateChartForFilter();
+}
+
+// ── Date matching ────────────────────────────────────────────
+function matchDate(ts) {
+  if (dateFilter === 'all') return true;
+  const day = ts.slice(0,10);
+  if (dateFilter === 'today')  return day === todayStr();
+  if (dateFilter === 'custom') return day === customDate;
+  return true;
+}
+
+// ── Get filtered events ──────────────────────────────────────
+function getFiltered() {
+  const search = document.getElementById('search').value.toLowerCase();
+  return allEvents.filter(e => {
+    if (levelFilter !== 'all' && e.level !== levelFilter) return false;
+    if (sourceFilter !== 'all' && e.source !== sourceFilter) return false;
+    if (!matchDate(e.timestamp)) return false;
+    if (search && !e.message.toLowerCase().includes(search)
+               && !e.source.toLowerCase().includes(search)) return false;
+    return true;
   });
+}
 
-  function setFilter(level) {
-    currentFilter = level;
-    // Update filter buttons
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-      btn.className = 'filter-btn';
-      if (btn.textContent.includes('All')      && level === 'all')      btn.classList.add('active-all');
-      if (btn.textContent.includes('Critical') && level === 'CRITICAL') btn.classList.add('active-CRITICAL');
-      if (btn.textContent.includes('Warning')  && level === 'WARNING')  btn.classList.add('active-WARNING');
-      if (btn.textContent.includes('Info')     && level === 'INFO')     btn.classList.add('active-INFO');
-    });
-    renderTable();
+// ── Update chart based on current date filter ────────────────
+function updateChartForFilter() {
+  // Count by level for currently filtered date
+  const base = allEvents.filter(e => {
+    if (sourceFilter !== 'all' && e.source !== sourceFilter) return false;
+    return matchDate(e.timestamp);
+  });
+  const c = base.filter(e=>e.level==='CRITICAL').length;
+  const w = base.filter(e=>e.level==='WARNING').length;
+  const i = base.filter(e=>e.level==='INFO').length;
+  const total = c+w+i;
+
+  chart.data.datasets[0].data = [c,w,i];
+  chart.update();
+
+  document.getElementById('chart-total').textContent = total;
+  document.getElementById('leg-critical').textContent = c;
+  document.getElementById('leg-warning').textContent  = w;
+  document.getElementById('leg-info').textContent     = i;
+
+  // Update stat cards too
+  document.getElementById('cnt-all').textContent      = total;
+  document.getElementById('cnt-critical').textContent = c;
+  document.getElementById('cnt-warning').textContent  = w;
+  document.getElementById('cnt-info').textContent     = i;
+}
+
+// ── Render table ─────────────────────────────────────────────
+function renderTable() {
+  const filtered = getFiltered();
+  document.getElementById('shown').textContent = filtered.length;
+  const tbody = document.getElementById('tbody');
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4"><div class="empty">🔍 No events match filters</div></td></tr>`;
+    return;
   }
+  tbody.innerHTML = filtered.map(e => `
+    <tr>
+      <td class="td-time">${e.timestamp}</td>
+      <td class="td-src"><span class="src-tag">${e.source}</span></td>
+      <td class="td-lvl"><span class="badge ${e.level}">${e.level}</span></td>
+      <td class="td-msg" title="${e.message.replace(/"/g,'&quot;')}">${e.message}</td>
+    </tr>
+  `).join('');
+}
 
-  function renderTable() {
-    const sourceFilter = document.getElementById('source-filter').value;
-    let filtered = allEvents;
-
-    if (currentFilter !== 'all') {
-      filtered = filtered.filter(e => e.level === currentFilter);
-    }
-    if (sourceFilter !== 'all') {
-      filtered = filtered.filter(e => e.source === sourceFilter);
-    }
-
-    const tbody = document.getElementById('events-body');
-    document.getElementById('event-count').textContent = filtered.length;
-
-    if (filtered.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:#8b949e">No events found</td></tr>';
-      return;
-    }
-
-    tbody.innerHTML = filtered.map(e => `
-      <tr>
-        <td class="td-time">${e.timestamp}</td>
-        <td><span class="source-tag">${e.source}</span></td>
-        <td><span class="badge ${e.level}">${e.level}</span></td>
-        <td class="td-msg" title="${e.message}">${e.message}</td>
-      </tr>
+// ── Build source list ────────────────────────────────────────
+function buildSources() {
+  const sources = {};
+  allEvents.forEach(e => { sources[e.source]=(sources[e.source]||0)+1; });
+  document.getElementById('source-list').innerHTML =
+    [['all','All sources'], ...Object.entries(sources)].map(([s,c]) => `
+      <div class="source-item ${sourceFilter===s?'active':''}" onclick="setSource('${s}')">
+        <span class="source-name">${s==='all'?'📋 All sources':s}</span>
+        <span class="source-badge">${s==='all'?allEvents.length:c}</span>
+      </div>
     `).join('');
-  }
+}
 
-  function fetchStats() {
-    fetch('/api/stats').then(r => r.json()).then(data => {
-      const total = (data.CRITICAL||0) + (data.WARNING||0) + (data.INFO||0);
-      document.getElementById('count-all').textContent      = total;
-      document.getElementById('count-critical').textContent = data.CRITICAL || 0;
-      document.getElementById('count-warning').textContent  = data.WARNING  || 0;
+function setSource(s) {
+  sourceFilter = s;
+  buildSources();
+  renderTable();
+  updateChartForFilter();
+}
 
-      chart.data.datasets[0].data = [data.CRITICAL||0, data.WARNING||0, data.INFO||0];
-      chart.update();
+// ── Fetch data ───────────────────────────────────────────────
+function fetchEvents() {
+  fetch('/api/events?limit=1000').then(r=>r.json()).then(data => {
+    allEvents = data;
+    buildSources();
+    renderTable();
+    updateChartForFilter();
+    document.getElementById('updated').textContent = 'Updated '+new Date().toLocaleTimeString();
+  });
+}
 
-      // Source breakdown
-      const sources = {};
-      allEvents.forEach(e => { sources[e.source] = (sources[e.source]||0) + 1; });
-      document.getElementById('source-list').innerHTML = Object.entries(sources).map(([s,c]) => `
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <span class="source-tag">${s}</span>
-          <span style="color:#8b949e;font-size:0.78rem;">${c} events</span>
-        </div>
-      `).join('');
-    });
-  }
-
-  function fetchEvents() {
-    fetch('/api/events').then(r => r.json()).then(data => {
-      allEvents = data;
-      renderTable();
-      document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
-    });
-  }
-
-  // Initial load + auto refresh every 5s
-  fetchStats();
-  fetchEvents();
-  setInterval(() => { fetchStats(); fetchEvents(); }, 5000);
+fetchEvents();
+setInterval(fetchEvents, 5000);
 </script>
 </body>
 </html>

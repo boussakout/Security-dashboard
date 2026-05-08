@@ -1,7 +1,7 @@
 import sqlite3
 import os
 
-DB_PATH = os.path.join(os.path.dirname(__file__), "dashboard.db")
+DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "dashboard.db")
 
 def init_db():
     conn = sqlite3.connect(DB_PATH)
@@ -28,7 +28,7 @@ def save_event(timestamp, source, level, message):
     conn.commit()
     conn.close()
 
-def get_events(limit=100):
+def get_events(limit=1000):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute('''

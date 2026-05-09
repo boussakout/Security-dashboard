@@ -34,7 +34,6 @@ body {
   min-height: 100vh;
 }
 
-/* HEADER */
 .header {
   display: flex;
   align-items: center;
@@ -80,7 +79,6 @@ body {
   0%,100%{ opacity:1; } 50%{ opacity:0.2; }
 }
 
-/* TOP STATS ROW */
 .stats-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -103,7 +101,6 @@ body {
 }
 
 .stat-box:hover { border-color: var(--border2); background: #0c1520; }
-
 .stat-box.active.s-all      { border-color: var(--blue);   background: var(--blue-bg); }
 .stat-box.active.s-critical { border-color: var(--red);    background: var(--red-bg); }
 .stat-box.active.s-warning  { border-color: var(--yellow); background: var(--yellow-bg); }
@@ -141,14 +138,12 @@ body {
   margin-top: 3px;
 }
 
-/* MIDDLE ROW — chart + table */
 .content {
   display: grid;
   grid-template-columns: 280px 1fr;
   height: calc(100vh - 52px - 82px - 48px);
 }
 
-/* LEFT PANEL */
 .left-panel {
   background: var(--surface);
   border-right: 1px solid var(--border);
@@ -168,10 +163,7 @@ body {
   margin-bottom: 10px;
 }
 
-.chart-container {
-  position: relative;
-  width: 100%;
-}
+.chart-container { position: relative; width: 100%; }
 
 .chart-center {
   position: absolute;
@@ -181,26 +173,10 @@ body {
   pointer-events: none;
 }
 
-.chart-center-num {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--text);
-  line-height: 1;
-}
+.chart-center-num { font-size: 1.5rem; font-weight: 700; color: var(--text); line-height: 1; }
+.chart-center-lbl { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; }
 
-.chart-center-lbl {
-  font-size: 0.65rem;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-}
-
-.legend {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-top: 12px;
-}
+.legend { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
 
 .legend-item {
   display: flex;
@@ -209,25 +185,10 @@ body {
   font-size: 0.75rem;
 }
 
-.legend-dot {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  margin-right: 6px;
-  flex-shrink: 0;
-}
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; flex-shrink: 0; }
+.legend-left { display: flex; align-items: center; color: var(--muted); }
+.legend-count { font-weight: 600; color: var(--text); }
 
-.legend-left {
-  display: flex;
-  align-items: center;
-  color: var(--muted);
-}
-
-.legend-count {
-  font-weight: 600;
-  color: var(--text);
-}
-
-/* Source list */
 .source-item {
   display: flex;
   justify-content: space-between;
@@ -242,29 +203,11 @@ body {
 
 .source-item:hover { background: #111820; border-color: var(--border); }
 .source-item.active { background: var(--blue-bg); border-color: var(--blue); }
+.source-name { font-size: 0.75rem; font-family: monospace; color: var(--text); }
+.source-badge { font-size: 0.68rem; background: #111820; color: var(--muted); padding: 1px 7px; border-radius: 10px; }
 
-.source-name {
-  font-size: 0.75rem;
-  font-family: monospace;
-  color: var(--text);
-}
+.right-panel { display: flex; flex-direction: column; overflow: hidden; }
 
-.source-badge {
-  font-size: 0.68rem;
-  background: #111820;
-  color: var(--muted);
-  padding: 1px 7px;
-  border-radius: 10px;
-}
-
-/* RIGHT PANEL */
-.right-panel {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-/* TOOLBAR */
 .toolbar {
   display: flex;
   align-items: center;
@@ -308,12 +251,7 @@ body {
 .search-box:focus { outline:none; border-color:var(--blue); }
 .search-box::placeholder { color: var(--muted); }
 
-.date-group {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-left: auto;
-}
+.date-group { display: flex; align-items: center; gap: 6px; margin-left: auto; }
 
 .date-btn {
   padding: 4px 10px;
@@ -340,12 +278,7 @@ body {
 
 .date-input:focus { outline:none; border-color:var(--blue); }
 
-/* TABLE */
-.table-wrap {
-  flex: 1;
-  overflow-y: auto;
-}
-
+.table-wrap { flex: 1; overflow-y: auto; }
 .table-wrap::-webkit-scrollbar { width: 4px; }
 .table-wrap::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
 
@@ -364,8 +297,14 @@ thead th {
   white-space: nowrap;
 }
 
-tbody tr { border-bottom: 1px solid #0d1420; transition: background 0.1s; }
-tbody tr:hover { background: #0d1520; }
+tbody tr {
+  border-bottom: 1px solid #0d1420;
+  transition: background 0.1s;
+  cursor: pointer;
+}
+
+tbody tr:hover { background: #0d1a2e; }
+
 tbody td { padding: 7px 14px; vertical-align: middle; }
 
 .td-time  { white-space:nowrap; color:var(--muted); font-size:0.73rem; font-family:monospace; width:155px; }
@@ -397,7 +336,6 @@ tbody td { padding: 7px 14px; vertical-align: middle; }
   border: 1px solid var(--border);
 }
 
-/* STATUS BAR */
 .statusbar {
   display: flex;
   justify-content: space-between;
@@ -410,11 +348,151 @@ tbody td { padding: 7px 14px; vertical-align: middle; }
 
 .statusbar b { color: var(--blue); }
 
-.empty {
-  text-align: center;
-  padding: 60px;
+.empty { text-align: center; padding: 60px; color: var(--muted); font-size: 0.85rem; }
+
+/* ── MODAL ─────────────────────────────────────────────────── */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  z-index: 999;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay.open { display: flex; }
+
+.modal-box {
+  background: #0d1117;
+  border: 1px solid #2a3441;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 640px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.modal-title {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #e6edf3;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modal-close {
+  background: none;
+  border: none;
   color: var(--muted);
-  font-size: 0.85rem;
+  font-size: 1.2rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.modal-close:hover { color: var(--text); background: #1e2733; }
+
+.modal-body {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.modal-body::-webkit-scrollbar { width: 4px; }
+.modal-body::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+.modal-grid {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 10px 16px;
+  margin-bottom: 20px;
+  font-size: 0.8rem;
+}
+
+.modal-label { color: var(--muted); padding-top: 2px; }
+.modal-value { color: var(--text); }
+
+.modal-divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+.modal-msg-label {
+  font-size: 0.68rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 8px;
+}
+
+.modal-msg-box {
+  background: #070b0f;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.78rem;
+  color: #cdd9e5;
+  word-break: break-all;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.btn-copy {
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border2);
+  background: #111820;
+  color: var(--muted);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-copy:hover { color: var(--text); border-color: var(--blue); }
+.btn-copy.copied { color: var(--green); border-color: var(--green); }
+
+.btn-close-modal {
+  padding: 6px 16px;
+  border-radius: 6px;
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-close-modal:hover { color: var(--text); background: #1e2733; }
+
+.click-hint {
+  font-size: 0.68rem;
+  color: var(--muted);
+  padding: 4px 16px 0;
+  font-style: italic;
 }
 </style>
 </head>
@@ -463,7 +541,6 @@ tbody td { padding: 7px 14px; vertical-align: middle; }
 
   <!-- LEFT PANEL -->
   <div class="left-panel">
-
     <div>
       <div class="panel-title">Events by Level</div>
       <div class="chart-container">
@@ -488,18 +565,15 @@ tbody td { padding: 7px 14px; vertical-align: middle; }
         </div>
       </div>
     </div>
-
     <div>
       <div class="panel-title">Sources</div>
       <div id="source-list"></div>
     </div>
-
   </div>
 
   <!-- RIGHT PANEL -->
   <div class="right-panel">
 
-    <!-- TOOLBAR -->
     <div class="toolbar">
       <button class="filter-btn f-all active"      onclick="setLevel('all')">All</button>
       <button class="filter-btn f-CRITICAL"        onclick="setLevel('CRITICAL')">🔴 Critical</button>
@@ -508,13 +582,14 @@ tbody td { padding: 7px 14px; vertical-align: middle; }
       <div class="sep"></div>
       <input class="search-box" id="search" placeholder="🔍 Search..." oninput="renderTable()"/>
       <div class="date-group">
-        <button class="date-btn active" id="btn-alltime"   onclick="setDate('all')">All time</button>
-        <button class="date-btn"        id="btn-today"     onclick="setDate('today')">Today</button>
+        <button class="date-btn active" id="btn-alltime" onclick="setDate('all')">All time</button>
+        <button class="date-btn"        id="btn-today"   onclick="setDate('today')">Today</button>
         <input  class="date-input" type="date" id="date-picker" onchange="setDate('custom')" title="Pick a date"/>
       </div>
     </div>
 
-    <!-- TABLE -->
+    <div class="click-hint">💡 Cliquez sur un événement pour voir son message complet</div>
+
     <div class="table-wrap">
       <table>
         <thead>
@@ -531,23 +606,57 @@ tbody td { padding: 7px 14px; vertical-align: middle; }
       </table>
     </div>
 
-    <!-- STATUS BAR -->
     <div class="statusbar">
       <div>Showing <b id="shown">0</b> events</div>
       <div id="updated"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL ──────────────────────────────────────────────── -->
+<div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modal-heading">
+
+    <div class="modal-header">
+      <div class="modal-title">
+        🔍 <span id="modal-heading">Détail de l'événement</span>
+      </div>
+      <button class="modal-close" onclick="closeModal()" aria-label="Fermer">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="modal-grid">
+        <span class="modal-label">Heure</span>
+        <span class="modal-value" id="m-time"></span>
+
+        <span class="modal-label">Source</span>
+        <span class="modal-value" id="m-source"></span>
+
+        <span class="modal-label">Niveau</span>
+        <span class="modal-value" id="m-level"></span>
+      </div>
+
+      <hr class="modal-divider">
+
+      <div class="modal-msg-label">Message complet</div>
+      <div class="modal-msg-box" id="m-message"></div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-copy" id="btn-copy" onclick="copyMessage()">📋 Copier</button>
+      <button class="btn-close-modal" onclick="closeModal()">Fermer</button>
     </div>
 
   </div>
 </div>
 
 <script>
-let allEvents   = [];
-let levelFilter = 'all';
-let dateFilter  = 'all';
-let customDate  = '';
+let allEvents    = [];
+let levelFilter  = 'all';
+let dateFilter   = 'all';
+let customDate   = '';
 let sourceFilter = 'all';
 
-// Chart
 const chart = new Chart(document.getElementById('chart').getContext('2d'), {
   type: 'doughnut',
   data: {
@@ -570,7 +679,6 @@ function todayStr() {
   return new Date().toISOString().slice(0,10);
 }
 
-// ── Set level filter ─────────────────────────────────────────
 function setLevel(level) {
   levelFilter = level;
   document.querySelectorAll('.stat-box').forEach(c => c.classList.remove('active'));
@@ -582,7 +690,6 @@ function setLevel(level) {
   updateChartForFilter();
 }
 
-// ── Set date filter ──────────────────────────────────────────
 function setDate(mode) {
   dateFilter = mode;
   document.querySelectorAll('.date-btn').forEach(b => b.classList.remove('active'));
@@ -597,7 +704,6 @@ function setDate(mode) {
   updateChartForFilter();
 }
 
-// ── Date matching ────────────────────────────────────────────
 function matchDate(ts) {
   if (dateFilter === 'all') return true;
   const day = ts.slice(0,10);
@@ -606,7 +712,6 @@ function matchDate(ts) {
   return true;
 }
 
-// ── Get filtered events ──────────────────────────────────────
 function getFiltered() {
   const search = document.getElementById('search').value.toLowerCase();
   return allEvents.filter(e => {
@@ -619,9 +724,7 @@ function getFiltered() {
   });
 }
 
-// ── Update chart based on current date filter ────────────────
 function updateChartForFilter() {
-  // Count by level for currently filtered date
   const base = allEvents.filter(e => {
     if (sourceFilter !== 'all' && e.source !== sourceFilter) return false;
     return matchDate(e.timestamp);
@@ -638,15 +741,12 @@ function updateChartForFilter() {
   document.getElementById('leg-critical').textContent = c;
   document.getElementById('leg-warning').textContent  = w;
   document.getElementById('leg-info').textContent     = i;
-
-  // Update stat cards too
   document.getElementById('cnt-all').textContent      = total;
   document.getElementById('cnt-critical').textContent = c;
   document.getElementById('cnt-warning').textContent  = w;
   document.getElementById('cnt-info').textContent     = i;
 }
 
-// ── Render table ─────────────────────────────────────────────
 function renderTable() {
   const filtered = getFiltered();
   document.getElementById('shown').textContent = filtered.length;
@@ -655,17 +755,18 @@ function renderTable() {
     tbody.innerHTML = `<tr><td colspan="4"><div class="empty">🔍 No events match filters</div></td></tr>`;
     return;
   }
-  tbody.innerHTML = filtered.map(e => `
-    <tr>
+  tbody.innerHTML = filtered.map((e, idx) => `
+    <tr onclick="openModal(${idx})" data-idx="${idx}">
       <td class="td-time">${e.timestamp}</td>
       <td class="td-src"><span class="src-tag">${e.source}</span></td>
       <td class="td-lvl"><span class="badge ${e.level}">${e.level}</span></td>
       <td class="td-msg" title="${e.message.replace(/"/g,'&quot;')}">${e.message}</td>
     </tr>
   `).join('');
+
+  window._filteredEvents = filtered;
 }
 
-// ── Build source list ────────────────────────────────────────
 function buildSources() {
   const sources = {};
   allEvents.forEach(e => { sources[e.source]=(sources[e.source]||0)+1; });
@@ -685,7 +786,55 @@ function setSource(s) {
   updateChartForFilter();
 }
 
-// ── Fetch data ───────────────────────────────────────────────
+/* ── MODAL FUNCTIONS ──────────────────────────────────────── */
+function openModal(idx) {
+  const e = window._filteredEvents[idx];
+  if (!e) return;
+
+  document.getElementById('m-time').textContent = e.timestamp;
+  document.getElementById('m-source').innerHTML =
+    `<span class="src-tag">${e.source}</span>`;
+
+  const colors = { CRITICAL: '#f85149', WARNING: '#e3b341', INFO: '#3fb950' };
+  const bgs    = { CRITICAL: 'var(--red-bg)', WARNING: 'var(--yellow-bg)', INFO: 'var(--green-bg)' };
+  document.getElementById('m-level').innerHTML =
+    `<span class="badge ${e.level}">${e.level}</span>`;
+
+  document.getElementById('m-message').textContent = e.message;
+
+  const btn = document.getElementById('btn-copy');
+  btn.textContent = '📋 Copier';
+  btn.classList.remove('copied');
+
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+
+function handleOverlayClick(ev) {
+  if (ev.target === document.getElementById('modal-overlay')) closeModal();
+}
+
+function copyMessage() {
+  const msg = document.getElementById('m-message').textContent;
+  navigator.clipboard.writeText(msg).then(() => {
+    const btn = document.getElementById('btn-copy');
+    btn.textContent = '✅ Copié !';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = '📋 Copier';
+      btn.classList.remove('copied');
+    }, 2000);
+  }).catch(() => {});
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+
+/* ── FETCH ────────────────────────────────────────────────── */
 function fetchEvents() {
   fetch('/api/events?limit=1000').then(r=>r.json()).then(data => {
     allEvents = data;

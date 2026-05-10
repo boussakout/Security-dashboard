@@ -1,0 +1,4 @@
+dashboard.db
+__pycache__/
+*.pyc
+mytokens

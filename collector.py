@@ -8,8 +8,10 @@ from db import init_db, save_event
 from datetime import datetime
 
 # ── Telegram config ──────────────────────────────────────────
-TELEGRAM_TOKEN   = ""
-TELEGRAM_CHAT_ID = ""
+TELEGRAM_TOKEN   = "8588479102:AAEI2lF9Ey0uOnvjLuMaWnIvw873irLrkMI"
+TELEGRAM_CHAT_ID = "8104779593"
+
+
 
 # ── Rate limiting ────────────────────────────────────────────
 last_alert_time = {}
@@ -175,22 +177,20 @@ def parse_line(source, line):
         if "session closed" in line:
             return (timestamp, "auth.log", "INFO", line.strip())
 
-    # ────────────────────────────────────────────────────────
+# ────────────────────────────────────────────────────────
     # UFW.LOG
-    # Only care about BLOCK on dangerous ports
-    # Ignore ALLOW, AUDIT, and non-dangerous port blocks
+    # Only log BLOCK events on dangerous ports
     # ────────────────────────────────────────────────────────
     if source == "ufw":
         dangerous_ports = [
             "DPT=22 ", "DPT=23 ", "DPT=3389 ",
             "DPT=445 ", "DPT=1433 ", "DPT=3306 ",
+            "DPT=80 ", "DPT=443 ",
         ]
         if "[UFW BLOCK]" in line:
             if any(p in line for p in dangerous_ports):
                 return (timestamp, "ufw.log", "CRITICAL", line.strip())
-        # Everything else (ALLOW, AUDIT, non-dangerous) = ignore
         return None
-
     # ────────────────────────────────────────────────────────
     # SYSLOG
     # Only real kernel security events

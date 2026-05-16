@@ -1,0 +1,52 @@
+sudo ufw logging medium
+#
+sudo systemctl restart rsyslog
+#
+python3 -c "
+import sqlite3, os
+conn = sqlite3.connect(os.path.expanduser('~/security-dashboard/dashboard.db'))
+conn.execute('DELETE FROM events')
+conn.commit()
+conn.close()
+print('✅ Cleared!')
+"
+#
+sudo python3 collector.py
+#
+python3 app.py
+
+# Test 1 — auth.log CRITICAL (SSH brute force)
+ssh fakeuser@localhost
+# type wrong password 3 times
+
+# Test 2 — auth.log WARNING (sudo)
+sudo ls /root
+
+# Test 3 — dpkg.log WARNING (package install)
+sudo apt install tree -y
+
+# Test 4 — syslog CRITICAL (out of memory)
+sudo bash -c 'echo "May 10 19:00:00 ubuntu kernel: Out of memory: Killed process 1234 (malware) total-vm:1024kB" >> /var/log/syslog'
+
+# Test 5 — syslog CRITICAL (segfault)
+sudo bash -c 'echo "May 10 19:00:00 ubuntu kernel: segfault at 00000000 ip 00000000 sp 00000000 error 4" >> /var/log/syslog'
+sudo bash -c 'echo "May 10 19:00:00 ubuntu kernel: apparmor=\"DENIED\" operation=\"exec\" profile=\"/usr/bin/test\"" >> /var/log/syslog'
+sudo bash -c 'echo "May 10 19:00:00 ubuntu kernel: No space left on device" >> /var/log/syslog'
+
+
+# Test 6 — ufw.log CRITICAL (firewall block on SSH port)
+sudo bash -c 'echo "May 10 19:00:00 ubuntu kernel: [UFW BLOCK] IN=enp0s3 OUT= SRC=192.168.1.100 DST=10.0.2.15 DPT=22 PROTO=TCP" >> /var/log/ufw.log'
+python3 -c "
+import sqlite3, os
+conn = sqlite3.connect(os.path.expanduser(~/security-dashboard/dashboard.db))
+conn.execute(DELETE FROM events)
+conn.commit()
+conn.close()
+"
+python3 -c "
+import sqlite3, os
+conn = sqlite3.connect(os.path.expanduser(~/security-dashboard/dashboard.db))
+conn.execute(DELETE FROM events)
+conn.commit()
+conn.close()
+"
